@@ -41,4 +41,7 @@ Gunakan prompt berikut untuk generate assets menggunakan AI image generator sepe
 - [x] Edit style.css: Tambah styling jika perlu untuk HUD baru (herbal, tea) - No additional styling needed
 - [x] Edit game.js: Tambah AI untuk hewan - predator berburu hewan makanan dan pemain, hewan makanan melarikan diri dari predator
 - [x] Edit game.js: Tambah mekanisme predator menyerang hewan makanan, menghilangkan hewan dan mengisi ulang kelaparan predator
+- [x] Edit game.js: Tambah counter hari yang bertambah setiap pergantian hari
+- [x] Edit game.js: Update HUD untuk menampilkan hari yang sudah bertahan
+- [x] Edit index.html: Tambah tampilan hari di environment info
 - [x] Test game: Jalankan index.html, cek semua fitur baru

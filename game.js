@@ -20,15 +20,19 @@ const thirstDisplay = document.getElementById('thirst');
 const woodDisplay = document.getElementById('wood');
 const snowDisplay = document.getElementById('snow');
 const foodDisplay = document.getElementById('food');
+const cookedFoodDisplay = document.getElementById('cookedFood');
 const waterDisplay = document.getElementById('water');
+const hotWaterDisplay = document.getElementById('hotWater');
 const herbalDisplay = document.getElementById('herbal');
 const teaDisplay = document.getElementById('tea');
 const timeDisplay = document.getElementById('time');
 const tempDisplay = document.getElementById('temperature');
+const daysDisplay = document.getElementById('days');
 const messageDisplay = document.getElementById('message');
 
 // --- State Game ---
 let gameOver = false;
+let daysSurvived = 0;
 let keys = {}; // Untuk menampung input keyboard
 
 const player = {
@@ -77,6 +81,7 @@ function toggleDayNight() {
     isDay = !isDay;
     clearInterval(timeCycle);
     if (isDay) {
+        daysSurvived++;
         ambientTemp = gameSettings.dayTemp;
         timeCycle = setInterval(toggleDayNight, gameSettings.dayDuration);
         canvas.style.backgroundColor = '#f0f8ff'; // AliceBlue
@@ -396,15 +401,15 @@ function draw() {
 
             // Gambar api menggunakan image
             if (images['apiunggun'].complete) {
-                ctx.drawImage(images['apiunggun'], campfire.x - 10, campfire.y - 10, 20, 20);
+                ctx.drawImage(images['apiunggun'], campfire.x - 20, campfire.y - 20, 40, 40);
             } else {
                 ctx.fillStyle = 'orange';
-                ctx.fillRect(campfire.x - 10, campfire.y - 10, 20, 20);
+                ctx.fillRect(campfire.x - 20, campfire.y - 20, 40, 40);
             }
         } else {
             // Gambar tumpukan kayu
             ctx.fillStyle = '#654321'; // Dark brown
-            ctx.fillRect(campfire.x - 10, campfire.y - 10, 20, 20);
+            ctx.fillRect(campfire.x - 20, campfire.y - 20, 40, 40);
         }
     }
 
@@ -424,10 +429,10 @@ function draw() {
     // Gambar Shelter
     if (shelter) {
         if (images['shelter'].complete) {
-            ctx.drawImage(images['shelter'], shelter.x - 15, shelter.y - 15, 30, 30);
+            ctx.drawImage(images['shelter'], shelter.x - 20, shelter.y - 20, 80, 80);
         } else {
             ctx.fillStyle = '#8B4513'; // Brown
-            ctx.fillRect(shelter.x - 15, shelter.y - 15, 30, 30);
+            ctx.fillRect(shelter.x - 20, shelter.y - 20, 80, 80);
         }
         // Gambar radius proteksi (untuk debugging)
         ctx.strokeStyle = 'rgba(0, 255, 0, 0.3)';
@@ -462,11 +467,14 @@ function draw() {
     woodDisplay.textContent = player.inventory.wood;
     snowDisplay.textContent = player.inventory.snow;
     foodDisplay.textContent = player.inventory.food;
+    cookedFoodDisplay.textContent = player.inventory.cookedFood;
     waterDisplay.textContent = player.inventory.water;
+    hotWaterDisplay.textContent = player.inventory.hotWater;
     herbalDisplay.textContent = player.inventory.herbal;
     teaDisplay.textContent = player.inventory.tea;
     timeDisplay.textContent = isDay ? "Siang" : "Malam";
     tempDisplay.textContent = `${ambientTemp}°C`;
+    daysDisplay.textContent = daysSurvived;
 }
 
 // --- Game Loop Utama ---
@@ -550,15 +558,6 @@ function handleInteraction() {
             campfire.fuel += 50; // Menambah bahan bakar
             player.inventory.wood--;
             messageDisplay.textContent = "Kayu ditambahkan ke api.";
-        } else if (campfire.isLit && player.inventory.snow > 0) {
-            player.inventory.snow--;
-            player.inventory.water++;
-            messageDisplay.textContent = "Salju dilelehkan menjadi air.";
-        } else if (campfire.isLit && player.inventory.herbal > 0 && player.inventory.water > 0) {
-            player.inventory.herbal--;
-            player.inventory.water--;
-            player.inventory.tea++;
-            messageDisplay.textContent = "Teh dibuat dari herbal dan air!";
         }
     } else if (stove && getDistance(player, stove) < 40) {
         // Interaksi dengan kompor
@@ -575,10 +574,10 @@ function handleInteraction() {
             player.inventory.food--;
             player.inventory.cookedFood++;
             messageDisplay.textContent = "Daging dimasak menjadi daging matang!";
-        } else if (stove.isLit && player.inventory.water > 0) {
-            player.inventory.water--;
-            player.inventory.hotWater++;
-            messageDisplay.textContent = "Air dipanaskan menjadi air panas!";
+        } else if (stove.isLit && player.inventory.snow > 0) {
+            player.inventory.snow--;
+            player.inventory.water++;
+            messageDisplay.textContent = "Salju dilelehkan menjadi air.";
         }
     } else {
         // Jika tidak ada interaksi, buat api unggun baru
@@ -623,7 +622,7 @@ function buildShelter() {
         shelter = {
             x: player.x + player.width / 2,
             y: player.y + player.height / 2,
-            protectionRadius: 120
+            protectionRadius: 150
         };
         player.inventory.wood -= 5;
         messageDisplay.textContent = "Shelter dibuat. Kamu aman dari serigala di dalamnya.";
@@ -691,16 +690,16 @@ function cookFood() {
 }
 
 function heatWater() {
-    if (stove && stove.isLit && player.inventory.water > 0) {
-        player.inventory.water--;
+    if (stove && stove.isLit && player.inventory.snow > 0) {
+        player.inventory.snow--;
         player.inventory.hotWater++;
-        messageDisplay.textContent = "Air dipanaskan menjadi air panas!";
+        messageDisplay.textContent = "Salju dipanaskan menjadi air panas!";
     } else if (!stove) {
-        messageDisplay.textContent = "Butuh kompor untuk memanaskan air.";
+        messageDisplay.textContent = "Butuh kompor untuk memanaskan salju.";
     } else if (!stove.isLit) {
         messageDisplay.textContent = "Kompor harus dinyalakan.";
     } else {
-        messageDisplay.textContent = "Butuh air untuk dipanaskan.";
+        messageDisplay.textContent = "Butuh salju untuk dipanaskan.";
     }
 }
 
